@@ -1318,6 +1318,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 1
   laneSpeed: 10
+  jumpLength: 7.5
+  jumpHeigth: 2
+  slideLength: 10
+  isJumping: 0
+  isSliding: 0
 --- !u!54 &1820559279
 Rigidbody:
   m_ObjectHideFlags: 0

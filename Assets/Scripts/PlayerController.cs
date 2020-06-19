@@ -7,18 +7,41 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 
+    [Header("Speed Parameters")]
     [SerializeField]
     private float speed;
 
     [SerializeField]
     private float laneSpeed;
 
+    [Header("Jump Parameters")]
+    [SerializeField]
+    private float jumpLength;
+
+    [SerializeField]
+    private float jumpHeigth;
+
+    [Header("Slide Parameters")]
+    [SerializeField]
+    private float slideLength;
+
     private Rigidbody _rigidbody;
+
+    // Horizontal Lane variables
     private int currentLane = 1;
     private Vector3 targetPosition;
 
+    // Swipe variables
     private bool isSwiping = false;
     private Vector2 startSwipePosition;
+
+    // Jump variables
+    private bool isJumping = false;
+    private float jumpStart;
+
+    // Slide variables
+    public bool isSliding = false;
+    private float slideStart;
 
     // Start is called before the first frame update
     void Awake()
@@ -37,8 +60,16 @@ public class PlayerController : MonoBehaviour
         {
             MovePlayerHorizontal(false);
         }
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            Jump();
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            Slide();
+        }
 
-        if(Input.touchCount == 1)
+        if (Input.touchCount == 1)
         {
             if (isSwiping)
             {
@@ -55,6 +86,17 @@ public class PlayerController : MonoBehaviour
                         else
                         {
                             MovePlayerHorizontal(false);
+                        }
+                    }
+                    else
+                    {
+                        if (magnitude.y > 0f)
+                        {
+                            Jump();
+                        }
+                        else
+                        {
+                            Slide();
                         }
                     }
 
@@ -74,8 +116,52 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        if (isJumping)
+        {
+            float ratio = (transform.position.z - jumpStart) / jumpLength;
+            if (ratio >= 1f)
+            {
+                isJumping = false;
+            }
+            else
+            {
+                this.targetPosition.y = Mathf.Sin(ratio * Mathf.PI) * jumpHeigth;
+            }
+        }
+        else
+        {
+            this.targetPosition.y = Mathf.MoveTowards(this.targetPosition.y, 0, 5 * Time.deltaTime);
+        }
+
+        if (isSliding)
+        {
+            float ratio = (transform.position.z - slideStart) / slideLength;
+            if (ratio > 1f)
+            {
+                isSliding = false;
+            }
+        }
+
         Vector3 targetPosition = new Vector3(this.targetPosition.x, this.targetPosition.y, transform.position.z);
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, laneSpeed * Time.deltaTime);
+    }
+
+    private void Jump()
+    {
+        if (!isJumping)
+        {
+            jumpStart = transform.position.z;
+            isJumping = true;
+        }
+    }
+
+    private void Slide()
+    {
+        if (!isJumping && !isSliding)
+        {
+            slideStart = transform.position.z;
+            isSliding = true;
+        }
     }
 
     void MovePlayerHorizontal(bool isToRight = true)
