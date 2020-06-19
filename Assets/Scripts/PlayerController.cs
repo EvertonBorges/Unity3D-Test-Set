@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour
     private int currentLane = 1;
     private Vector3 targetPosition;
 
+    private bool isSwiping = false;
+    private Vector2 startSwipePosition;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -28,18 +31,54 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            MovePlayer();
+            MovePlayerHorizontal();
         }
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            MovePlayer(false);
+            MovePlayerHorizontal(false);
+        }
+
+        if(Input.touchCount == 1)
+        {
+            if (isSwiping)
+            {
+                Vector2 diff = Input.GetTouch(0).position - startSwipePosition;
+                Vector2 magnitude = new Vector2(diff.x / Screen.width, diff.y / Screen.height);
+                if (magnitude.magnitude > 0.01f)
+                {
+                    if (Mathf.Abs(magnitude.x) > Mathf.Abs(magnitude.y))
+                    {
+                        if (magnitude.x > 0f)
+                        {
+                            MovePlayerHorizontal();
+                        }
+                        else
+                        {
+                            MovePlayerHorizontal(false);
+                        }
+                    }
+
+                    isSwiping = false;
+                }
+            }
+
+            if(Input.GetTouch(0).phase == TouchPhase.Began)
+            {
+                isSwiping = true;
+                startSwipePosition = Input.GetTouch(0).position;
+            }
+
+            if(Input.GetTouch(0).phase == TouchPhase.Ended)
+            {
+                isSwiping = false;
+            }
         }
 
         Vector3 targetPosition = new Vector3(this.targetPosition.x, this.targetPosition.y, transform.position.z);
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, laneSpeed * Time.deltaTime);
     }
 
-    void MovePlayer(bool isToRight = true)
+    void MovePlayerHorizontal(bool isToRight = true)
     {
         int newLane = currentLane + (isToRight ? 1 : -1);
         if (newLane < 0 || newLane > 2) return;
