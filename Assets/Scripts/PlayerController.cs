@@ -26,6 +26,8 @@ public class PlayerController : MonoBehaviour
     private float slideLength;
 
     private Rigidbody _rigidbody;
+    private Animator _animator;
+    private BoxCollider _boxCollider;
 
     // Horizontal Lane variables
     private int currentLane = 1;
@@ -40,13 +42,23 @@ public class PlayerController : MonoBehaviour
     private float jumpStart;
 
     // Slide variables
-    public bool isSliding = false;
+    private bool isSliding = false;
     private float slideStart;
+    private Vector3 _boxColliderSize;
 
     // Start is called before the first frame update
     void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        _animator = GetComponentInChildren<Animator>();
+        _boxCollider = GetComponent<BoxCollider>();
+        _boxColliderSize = _boxCollider.size;
+
+    }
+
+    void Start()
+    {
+        _animator.Play("runStart");
     }
 
     // Update is called once per frame
@@ -122,6 +134,7 @@ public class PlayerController : MonoBehaviour
             if (ratio >= 1f)
             {
                 isJumping = false;
+                _animator.SetBool("Jumping", false);
             }
             else
             {
@@ -139,6 +152,8 @@ public class PlayerController : MonoBehaviour
             if (ratio > 1f)
             {
                 isSliding = false;
+                _animator.SetBool("Sliding", false);
+                _boxCollider.size = _boxColliderSize;
             }
         }
 
@@ -151,6 +166,8 @@ public class PlayerController : MonoBehaviour
         if (!isJumping)
         {
             jumpStart = transform.position.z;
+            _animator.SetFloat("JumpSpeed", speed / jumpLength);
+            _animator.SetBool("Jumping", true);
             isJumping = true;
         }
     }
@@ -160,6 +177,11 @@ public class PlayerController : MonoBehaviour
         if (!isJumping && !isSliding)
         {
             slideStart = transform.position.z;
+            _animator.SetFloat("JumpSpeed", speed / slideLength);
+            _animator.SetBool("Sliding", true);
+            Vector3 slideBoxColliderSize = _boxColliderSize;
+            slideBoxColliderSize.y = slideBoxColliderSize.y / 2;
+            _boxCollider.size = slideBoxColliderSize;
             isSliding = true;
         }
     }
