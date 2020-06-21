@@ -46,6 +46,10 @@ public class PlayerController : MonoBehaviour
     private float slideStart;
     private Vector3 _boxColliderSize;
 
+    // Camera variables
+    private float _cameraAnimationDuration;
+    private bool startToRun = false;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -53,17 +57,23 @@ public class PlayerController : MonoBehaviour
         _animator = GetComponentInChildren<Animator>();
         _boxCollider = GetComponent<BoxCollider>();
         _boxColliderSize = _boxCollider.size;
-
-    }
-
-    void Start()
-    {
-        _animator.Play("runStart");
+        _cameraAnimationDuration = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFollow>().GetAnimationDuration();
     }
 
     // Update is called once per frame
     void Update()
     {
+
+        if (Time.time <= _cameraAnimationDuration)
+        {
+            return;
+        }
+        else if (!startToRun)
+        {
+            startToRun = true;
+            _animator.Play("runStart");
+        }
+
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             MovePlayerHorizontal();
@@ -197,7 +207,10 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        _rigidbody.velocity = Vector3.forward * speed;
+        if (startToRun)
+        {
+            _rigidbody.velocity = Vector3.forward * speed;
+        }
     }
 
 }
