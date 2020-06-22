@@ -50,6 +50,8 @@ public class PlayerController : MonoBehaviour
     private float _cameraAnimationDuration;
     private bool startToRun = false;
 
+    private bool isDead = false;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -63,6 +65,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        if (isDead)
+        {
+            return;
+        }
 
         if (Time.time <= _cameraAnimationDuration)
         {
@@ -207,9 +214,25 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (isDead)
+        {
+            _rigidbody.velocity = Vector3.zero;
+            return;
+        }
+
         if (startToRun)
         {
             _rigidbody.velocity = Vector3.forward * speed;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Obstacle"))
+        {
+            isDead = true;
+            _animator.SetTrigger("Hit");
+            _animator.SetBool("Dead", true);
         }
     }
 
