@@ -45,6 +45,7 @@ public class PlayerController : MonoBehaviour
     private bool isSliding = false;
     private float slideStart;
     private Vector3 _boxColliderSize;
+    private Vector3 _boxColliderCenter;
 
     // Camera variables
     private float _cameraAnimationDuration;
@@ -59,6 +60,7 @@ public class PlayerController : MonoBehaviour
         _animator = GetComponentInChildren<Animator>();
         _boxCollider = GetComponent<BoxCollider>();
         _boxColliderSize = _boxCollider.size;
+        _boxColliderCenter = _boxCollider.center;
         _cameraAnimationDuration = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFollow>().GetAnimationDuration();
     }
 
@@ -171,6 +173,7 @@ public class PlayerController : MonoBehaviour
                 isSliding = false;
                 _animator.SetBool("Sliding", false);
                 _boxCollider.size = _boxColliderSize;
+                _boxCollider.center = _boxColliderCenter;
             }
         }
 
@@ -198,6 +201,7 @@ public class PlayerController : MonoBehaviour
             _animator.SetBool("Sliding", true);
             Vector3 slideBoxColliderSize = _boxColliderSize;
             slideBoxColliderSize.y = slideBoxColliderSize.y / 2;
+            _boxCollider.center = _boxColliderCenter / 2;
             _boxCollider.size = slideBoxColliderSize;
             isSliding = true;
         }
@@ -230,6 +234,8 @@ public class PlayerController : MonoBehaviour
     {
         if (other.CompareTag("Obstacle"))
         {
+            other.GetComponent<Obstacle>().Impacted();
+
             isDead = true;
             _animator.SetTrigger("Hit");
             _animator.SetBool("Dead", true);

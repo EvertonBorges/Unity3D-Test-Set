@@ -32,25 +32,23 @@ public class TrackController : MonoBehaviour
 
         obstacles.Clear();
 
-        float spawnZPosition = transform.position.z - 90f;
+        float spawnZPosition = transform.position.z;
         float zPosition = spawnZPosition;
 
-        while(zPosition < transform.position.z + 90f)
+        while(zPosition < transform.position.z + 180f)
         {
             int sortPrefabIndex = Random.Range(0, obstaclesPrefab.Length);
             GameObject prefab = obstaclesPrefab[sortPrefabIndex];
 
             zPosition += 
                 obstacles.Count == 0 ? 
-                maxDistanceBetweenObstacles * 2 : 
+                maxDistanceBetweenObstacles : 
                 Random.Range(minDistanceBetweenObstacles, maxDistanceBetweenObstacles);
 
             GameObject obstacle = Instantiate(prefab, transform);
             Vector3 newPosition = new Vector3(0f, 0f, zPosition);
             obstacle.transform.position = newPosition;
             obstacles.Add(obstacle);
-
-            
         }
     }
 
