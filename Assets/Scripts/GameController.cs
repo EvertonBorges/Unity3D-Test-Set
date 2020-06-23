@@ -11,6 +11,12 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     private Text textCoins;
 
+    [SerializeField]
+    private Text textScore;
+
+    [SerializeField]
+    private Text textDistance;
+
     private bool isPause = false;
 
     void Start() {
@@ -27,9 +33,19 @@ public class GameController : MonoBehaviour {
         panelGameOver.gameObject.SetActive(true);
     }
 
-    public void UpdateCoins(string score)
+    public void UpdateCoins(string coins)
     {
-        textCoins.text = score;
+        textCoins.text = coins;
+    }
+
+    public void UpdateScore(string score)
+    {
+        textScore.text = score;
+    }
+
+    public void UpdateDistance(string distance)
+    {
+        textDistance.text = distance + "m";
     }
 
 }

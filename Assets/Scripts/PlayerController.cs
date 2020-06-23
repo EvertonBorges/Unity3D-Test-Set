@@ -12,6 +12,12 @@ public class PlayerController : MonoBehaviour
     private float speed;
 
     [SerializeField]
+    private float minSpeed;
+
+    [SerializeField]
+    private float maxSpeed;
+
+    [SerializeField]
     private float laneSpeed;
 
     [Header("Jump Parameters")]
