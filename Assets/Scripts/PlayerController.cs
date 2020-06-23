@@ -105,7 +105,7 @@ public class PlayerController : MonoBehaviour
         _speed = minSpeed;
 
         _startTimeToLockCamera = Time.time + _cameraAnimationDuration;
-        _startTimeToRun = _startTimeToLockCamera + 3f;
+        _startTimeToRun = _startTimeToLockCamera + 3.25f;
     }
 
     void Update()
@@ -134,6 +134,12 @@ public class PlayerController : MonoBehaviour
             _animator.Play("Start");
             _cameraLock = true;
             _gameController.ShowUiGame();
+            
+        }
+
+        if (_cameraLock && Time.time >= _startTimeToLockCamera + 0.25f && !_audioSource.isPlaying && !_startToRun)
+        {
+            MakeSound(readStartClip);
         }
 
         if (!_startToRun && Time.time >= _startTimeToRun)
@@ -294,16 +300,13 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (_isPause || _isDead)
+        if (_isPause || _isDead || !_startToRun)
         {
             _rigidbody.velocity = Vector3.zero;
             return;
         }
 
-        if (_startToRun)
-        {
-            _rigidbody.velocity = Vector3.forward * _speed;
-        }
+        _rigidbody.velocity = Vector3.forward * _speed;
     }
 
     private void OnTriggerEnter(Collider other)
