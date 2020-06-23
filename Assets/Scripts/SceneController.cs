@@ -31,7 +31,7 @@ public class SceneController : MonoBehaviour {
         SceneManager.LoadScene("Menu");
     }
 
-    private void PressButton()
+    public void PressButton()
     {
         _audioSource.clip = _pressButtonSfx;
         _audioSource.Play();

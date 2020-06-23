@@ -49,6 +49,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private AudioClip deathClip;
 
+    [SerializeField]
+    private AudioClip readStartClip;
+
     private Rigidbody _rigidbody;
     private Animator _animator;
     private BoxCollider _boxCollider;
@@ -83,8 +86,9 @@ public class PlayerController : MonoBehaviour
     private bool _cameraLock = false;
     private bool _startToRun = false;
 
-    // Death variables
-    private bool isDead = false;
+    // Game State variables
+    private bool _isDead = false;
+    private bool _isPause = false;
 
     void Awake()
     {
@@ -107,8 +111,19 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
 
-        if (isDead)
+        if (_isPause)
         {
+            _animator.speed = 0f;
+            return;
+        } 
+        else if (_animator.speed != 1f)
+        {
+            _animator.speed = 1f;
+        }
+
+        if (_isDead)
+        {
+            _gameController.GameOver();
             this.targetPosition.y = Mathf.MoveTowards(this.targetPosition.y, 0, 5 * Time.deltaTime);
             Move();
             return;
@@ -118,12 +133,14 @@ public class PlayerController : MonoBehaviour
         {
             _animator.Play("Start");
             _cameraLock = true;
+            _gameController.ShowUiGame();
         }
 
         if (!_startToRun && Time.time >= _startTimeToRun)
         {
             _animator.Play("runStart");
             _startToRun = true;
+            _gameController.ShowPauseButton();
         }
 
         if (!_cameraLock || !_startToRun)
@@ -277,7 +294,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isDead)
+        if (_isPause || _isDead)
         {
             _rigidbody.velocity = Vector3.zero;
             return;
@@ -295,7 +312,7 @@ public class PlayerController : MonoBehaviour
         {
             other.GetComponent<Obstacle>().Impacted();
 
-            isDead = true;
+            _isDead = true;
             _animator.SetTrigger("Hit");
             _animator.SetBool("Dead", true);
 
@@ -317,15 +334,25 @@ public class PlayerController : MonoBehaviour
 
     public void IncreaseSpeed()
     {
-        _speed *= speedMultiplier;
+        int speedMultiplication = SpeedMultiplication();
+        _speed *= speedMultiplier / speedMultiplication;
         if (_speed >= maxSpeed) _speed = maxSpeed;
-        print("Speed: " + _speed);
     }
 
     public int SpeedMultiplication()
     {
         float proportion = _speed / minSpeed * 100 - 100;
         return (proportion < 50) ? 1 : (proportion < 100) ? 2 : proportion < 150 ? 3 : proportion < 200 ? 4 : 5;
+    }
+
+    public void Pause()
+    {
+        _isPause = true;
+    }
+
+    public void UnPause()
+    {
+        _isPause = false;
     }
 
 }
