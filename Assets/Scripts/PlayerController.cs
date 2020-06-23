@@ -335,7 +335,7 @@ public class PlayerController : MonoBehaviour
     public void IncreaseSpeed()
     {
         int speedMultiplication = SpeedMultiplication();
-        _speed *= speedMultiplier / speedMultiplication;
+        _speed *= 1f + ((speedMultiplier - 1f) / speedMultiplication);
         if (_speed >= maxSpeed) _speed = maxSpeed;
     }
 
