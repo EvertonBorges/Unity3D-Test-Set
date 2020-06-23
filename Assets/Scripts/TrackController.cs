@@ -35,7 +35,7 @@ public class TrackController : MonoBehaviour
         obstaclesPrefab.AddRange(obstaclesPrefabAnywhere);
         obstaclesPrefab.AddRange(obstaclesPrefabInCenter);
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 200; i++)
         {
             GameObject coin = Instantiate(coinPrefab, transform);
             coin.SetActive(false);
@@ -99,17 +99,17 @@ public class TrackController : MonoBehaviour
 
         for (int i = 0; i < spacesBetweenObstacles.Count; i++)
         {
-            bool spawnCoins = Random.Range(0, 100) < 50 ? true : false;
+            bool spawnCoins = Random.Range(0, 100) < 75 ? true : false;
             if (spawnCoins)
             {
                 int sortXPosition = Random.Range(-1, 2);
                 for (int z = spacesBetweenObstacles[i][0]; z <= spacesBetweenObstacles[i][1]; z++)
                 {
                     GameObject coin = poolCoins[0];
-                    poolCoins.RemoveAt(0);
                     coin.transform.position = new Vector3(sortXPosition, 0.5f, z);
                     coin.SetActive(true);
                     coins.Add(coin);
+                    poolCoins.RemoveAt(0);
                 }
             }
         }
@@ -119,6 +119,7 @@ public class TrackController : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            other.GetComponent<PlayerController>().IncreaseSpeed();
             transform.position += Vector3.forward * 180f * 2;
             PositionateObstacles();
             PositionateCoins();

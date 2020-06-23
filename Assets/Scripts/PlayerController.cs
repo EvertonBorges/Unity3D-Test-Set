@@ -9,13 +9,17 @@ public class PlayerController : MonoBehaviour
 
     [Header("Speed Parameters")]
 
-    [Range(5f, 20f)]
+    [Range(5, 20)]
     [SerializeField]
     private int minSpeed;
 
-    [Range(20f, 40f)]
+    [Range(20, 40)]
     [SerializeField]
     private int maxSpeed;
+
+    [Range(1f, 1.5f)]
+    [SerializeField]
+    private float speedMultiplier;
 
     [SerializeField]
     private float laneSpeed;
@@ -60,9 +64,9 @@ public class PlayerController : MonoBehaviour
     private float _cameraAnimationDuration;
     private bool startToRun = false;
 
+    // Death variables
     private bool isDead = false;
 
-    // Start is called before the first frame update
     void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
@@ -75,7 +79,6 @@ public class PlayerController : MonoBehaviour
         _speed = minSpeed;
     }
 
-    // Update is called once per frame
     void Update()
     {
 
@@ -265,6 +268,13 @@ public class PlayerController : MonoBehaviour
             other.GetComponent<Collectable>().Collected();
             LevelManager.GetInstance().AddCoin();
         }
+    }
+
+    public void IncreaseSpeed()
+    {
+        _speed *= speedMultiplier;
+        if (_speed >= maxSpeed) _speed = maxSpeed;
+        print("Speed: " + _speed);
     }
 
 }

@@ -3925,7 +3925,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minSpeed: 10
-  maxSpeed: 40
+  maxSpeed: 30
+  speedMultiplier: 1.15
   laneSpeed: 10
   jumpLength: 7.5
   jumpHeigth: 1.5
