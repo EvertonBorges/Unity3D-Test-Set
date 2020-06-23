@@ -6,7 +6,10 @@ public class TrackController : MonoBehaviour
 {
 
     [SerializeField]
-    private GameObject[] obstaclesPrefab;
+    private List<GameObject> obstaclesPrefabInCenter;
+
+    [SerializeField]
+    private List<GameObject> obstaclesPrefabAnywhere;
 
     [SerializeField]
     private GameObject coinPrefab;
@@ -19,6 +22,8 @@ public class TrackController : MonoBehaviour
     [Range(15f, 23f)]
     private float maxDistanceBetweenObstacles;
 
+    private List<GameObject> obstaclesPrefab = new List<GameObject>();
+
     private List<GameObject> obstacles = new List<GameObject>();
     private List<GameObject> coins = new List<GameObject>();
     private List<int[]> spacesBetweenObstacles = new List<int[]>();
@@ -27,6 +32,9 @@ public class TrackController : MonoBehaviour
 
     void Start()
     {
+        obstaclesPrefab.AddRange(obstaclesPrefabAnywhere);
+        obstaclesPrefab.AddRange(obstaclesPrefabInCenter);
+
         for (int i = 0; i < 100; i++)
         {
             GameObject coin = Instantiate(coinPrefab, transform);
@@ -53,7 +61,7 @@ public class TrackController : MonoBehaviour
 
         while(zPosition < transform.position.z + 180f)
         {
-            int sortPrefabIndex = Random.Range(0, obstaclesPrefab.Length);
+            int sortPrefabIndex = Random.Range(0, obstaclesPrefab.Count);
             GameObject prefab = obstaclesPrefab[sortPrefabIndex];
 
             int[] spaceBetweenObstacles = new int[2];
@@ -69,7 +77,10 @@ public class TrackController : MonoBehaviour
             if (zPosition < transform.position.z + 180f)
             {
                 GameObject obstacle = Instantiate(prefab, transform);
-                Vector3 newPosition = new Vector3(0f, 0f, zPosition);
+
+                int xPosition = obstaclesPrefabInCenter.Contains(prefab) ? 0 : Random.Range(-1, 2);
+
+                Vector3 newPosition = new Vector3(xPosition, 0f, zPosition);
                 obstacle.transform.position = newPosition;
                 obstacles.Add(obstacle);
                 if (obstacles.Count > 1) spacesBetweenObstacles.Add(spaceBetweenObstacles);
