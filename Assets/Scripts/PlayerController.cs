@@ -70,6 +70,8 @@ public class PlayerController : MonoBehaviour
 
         if (isDead)
         {
+            this.targetPosition.y = Mathf.MoveTowards(this.targetPosition.y, 0, 5 * Time.deltaTime);
+            Move();
             return;
         }
 
@@ -177,6 +179,11 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        Move();
+    }
+
+    private void Move()
+    {
         Vector3 targetPosition = new Vector3(this.targetPosition.x, this.targetPosition.y, transform.position.z);
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, laneSpeed * Time.deltaTime);
     }
