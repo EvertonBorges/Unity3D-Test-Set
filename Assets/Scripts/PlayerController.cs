@@ -8,14 +8,14 @@ public class PlayerController : MonoBehaviour
 {
 
     [Header("Speed Parameters")]
-    [SerializeField]
-    private float speed;
 
+    [Range(5f, 20f)]
     [SerializeField]
-    private float minSpeed;
+    private int minSpeed;
 
+    [Range(20f, 40f)]
     [SerializeField]
-    private float maxSpeed;
+    private int maxSpeed;
 
     [SerializeField]
     private float laneSpeed;
@@ -34,6 +34,9 @@ public class PlayerController : MonoBehaviour
     private Rigidbody _rigidbody;
     private Animator _animator;
     private BoxCollider _boxCollider;
+
+    // Speed variables
+    private float _speed;
 
     // Horizontal Lane variables
     private int currentLane = 1;
@@ -68,6 +71,8 @@ public class PlayerController : MonoBehaviour
         _boxColliderSize = _boxCollider.size;
         _boxColliderCenter = _boxCollider.center;
         _cameraAnimationDuration = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFollow>().GetAnimationDuration();
+
+        _speed = minSpeed;
     }
 
     // Update is called once per frame
@@ -157,31 +162,31 @@ public class PlayerController : MonoBehaviour
 
         if (isJumping)
         {
-            float ratio = (transform.position.z - jumpStart) / jumpLength;
+            float ratio = (transform.position.z - jumpStart) / (!isSliding ? jumpLength : jumpLength / 3);
             if (ratio >= 1f)
             {
                 isJumping = false;
                 _animator.SetBool("Jumping", false);
             }
             else
-            {
+            {   
                 this.targetPosition.y = Mathf.Sin(ratio * Mathf.PI) * jumpHeigth;
             }
         }
         else
         {
             this.targetPosition.y = Mathf.MoveTowards(this.targetPosition.y, 0, 5 * Time.deltaTime);
-        }
 
-        if (isSliding)
-        {
-            float ratio = (transform.position.z - slideStart) / slideLength;
-            if (ratio > 1f)
+            if (isSliding)
             {
-                isSliding = false;
-                _animator.SetBool("Sliding", false);
-                _boxCollider.size = _boxColliderSize;
-                _boxCollider.center = _boxColliderCenter;
+                float ratio = (transform.position.z - slideStart) / slideLength;
+                if (ratio > 1f)
+                {
+                    isSliding = false;
+                    _animator.SetBool("Sliding", false);
+                    _boxCollider.size = _boxColliderSize;
+                    _boxCollider.center = _boxColliderCenter;
+                }
             }
         }
 
@@ -199,7 +204,7 @@ public class PlayerController : MonoBehaviour
         if (!isJumping)
         {
             jumpStart = transform.position.z;
-            _animator.SetFloat("JumpSpeed", speed / jumpLength);
+            _animator.SetFloat("JumpSpeed", _speed / jumpLength);
             _animator.SetBool("Jumping", true);
             isJumping = true;
         }
@@ -207,10 +212,10 @@ public class PlayerController : MonoBehaviour
 
     private void Slide()
     {
-        if (!isJumping && !isSliding)
+        if (!isSliding)
         {
             slideStart = transform.position.z;
-            _animator.SetFloat("JumpSpeed", speed / slideLength);
+            _animator.SetFloat("JumpSpeed", _speed / slideLength);
             _animator.SetBool("Sliding", true);
             Vector3 slideBoxColliderSize = _boxColliderSize;
             slideBoxColliderSize.y = slideBoxColliderSize.y / 2;
@@ -239,7 +244,7 @@ public class PlayerController : MonoBehaviour
 
         if (startToRun)
         {
-            _rigidbody.velocity = Vector3.forward * speed;
+            _rigidbody.velocity = Vector3.forward * _speed;
         }
     }
 
