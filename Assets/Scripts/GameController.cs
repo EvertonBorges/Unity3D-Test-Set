@@ -45,7 +45,7 @@ public class GameController : MonoBehaviour {
 
     public void UpdateDistance(string distance)
     {
-        textDistance.text = distance + "m";
+        textDistance.text = distance + " m";
     }
 
 }

@@ -24,6 +24,8 @@ public class Collectable : MonoBehaviour
     private IEnumerator Disable()
     {
         yield return new WaitForSeconds(0.1f);
+
+        _meshRenderer.enabled = true;
         gameObject.SetActive(false);
     }
 
