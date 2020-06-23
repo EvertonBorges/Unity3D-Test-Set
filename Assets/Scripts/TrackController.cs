@@ -27,7 +27,7 @@ public class TrackController : MonoBehaviour
 
     void Start()
     {
-        for (int i = 0; i < 75; i++)
+        for (int i = 0; i < 100; i++)
         {
             GameObject coin = Instantiate(coinPrefab, transform);
             coin.SetActive(false);
