@@ -15,6 +15,9 @@ public class GameController : MonoBehaviour {
     private Text textScore;
 
     [SerializeField]
+    private Text textScoreMultiplier;
+
+    [SerializeField]
     private Text textDistance;
 
     private bool isPause = false;
@@ -38,14 +41,15 @@ public class GameController : MonoBehaviour {
         textCoins.text = coins;
     }
 
-    public void UpdateScore(string score)
+    public void UpdateScore(string score, string multiplier)
     {
         textScore.text = score;
+        textScoreMultiplier.text = multiplier;
     }
 
     public void UpdateDistance(string distance)
     {
-        textDistance.text = distance + " m";
+        textDistance.text = distance;
     }
 
 }

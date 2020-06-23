@@ -35,9 +35,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float slideLength;
 
+    [Header("Camera Parameters")]
+    [Range(0f, 3f)]
+    [SerializeField]
+    private float timeToStartAfterCameraLock;
+
     private Rigidbody _rigidbody;
     private Animator _animator;
     private BoxCollider _boxCollider;
+    private GameController _gameController;
 
     // Speed variables
     private float _speed;
@@ -62,7 +68,10 @@ public class PlayerController : MonoBehaviour
 
     // Camera variables
     private float _cameraAnimationDuration;
-    private bool startToRun = false;
+    private float _startTimeToLockCamera;
+    private float _startTimeToRun;
+    private bool _cameraLock = false;
+    private bool _startToRun = false;
 
     // Death variables
     private bool isDead = false;
@@ -72,11 +81,16 @@ public class PlayerController : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _animator = GetComponentInChildren<Animator>();
         _boxCollider = GetComponent<BoxCollider>();
+        _gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+
         _boxColliderSize = _boxCollider.size;
         _boxColliderCenter = _boxCollider.center;
         _cameraAnimationDuration = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraFollow>().GetAnimationDuration();
 
         _speed = minSpeed;
+
+        _startTimeToLockCamera = Time.time + _cameraAnimationDuration;
+        _startTimeToRun = _startTimeToLockCamera + 3f;
     }
 
     void Update()
@@ -89,14 +103,21 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (Time.time <= _cameraAnimationDuration)
+        if (!_cameraLock && Time.time >= _startTimeToLockCamera)
+        {
+            _animator.Play("Start");
+            _cameraLock = true;
+        }
+
+        if (!_startToRun && Time.time >= _startTimeToRun)
+        {
+            _animator.Play("runStart");
+            _startToRun = true;
+        }
+
+        if (!_cameraLock || !_startToRun)
         {
             return;
-        }
-        else if (!startToRun)
-        {
-            startToRun = true;
-            _animator.Play("runStart");
         }
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
@@ -247,7 +268,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (startToRun)
+        if (_startToRun)
         {
             _rigidbody.velocity = Vector3.forward * _speed;
         }
@@ -275,6 +296,12 @@ public class PlayerController : MonoBehaviour
         _speed *= speedMultiplier;
         if (_speed >= maxSpeed) _speed = maxSpeed;
         print("Speed: " + _speed);
+    }
+
+    public int SpeedMultiplication()
+    {
+        float proportion = _speed / minSpeed * 100 - 100;
+        return (proportion < 50) ? 1 : (proportion < 100) ? 2 : proportion < 150 ? 3 : proportion < 200 ? 4 : 5;
     }
 
 }
