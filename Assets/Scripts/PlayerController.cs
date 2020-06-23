@@ -206,7 +206,9 @@ public class PlayerController : MonoBehaviour
             jumpStart = transform.position.z;
             _animator.SetFloat("JumpSpeed", _speed / jumpLength);
             _animator.SetBool("Jumping", true);
+            _animator.SetBool("Sliding", false);
             isJumping = true;
+            isSliding = false;
         }
     }
 
