@@ -3,12 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody), typeof(AudioSource))]
 public class PlayerController : MonoBehaviour
 {
 
     [Header("Speed Parameters")]
-
     [Range(5, 20)]
     [SerializeField]
     private int minSpeed;
@@ -40,10 +39,21 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float timeToStartAfterCameraLock;
 
+    [Header("SFX")]
+    [SerializeField]
+    private AudioClip jumpClip;
+
+    [SerializeField]
+    private AudioClip slideClip;
+
+    [SerializeField]
+    private AudioClip deathClip;
+
     private Rigidbody _rigidbody;
     private Animator _animator;
     private BoxCollider _boxCollider;
     private GameController _gameController;
+    private AudioSource _audioSource;
 
     // Speed variables
     private float _speed;
@@ -81,6 +91,7 @@ public class PlayerController : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _animator = GetComponentInChildren<Animator>();
         _boxCollider = GetComponent<BoxCollider>();
+        _audioSource = GetComponent<AudioSource>();
         _gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
 
         _boxColliderSize = _boxCollider.size;
@@ -233,6 +244,8 @@ public class PlayerController : MonoBehaviour
             _animator.SetBool("Sliding", false);
             isJumping = true;
             isSliding = false;
+
+            MakeSound(jumpClip);
         }
     }
 
@@ -248,6 +261,8 @@ public class PlayerController : MonoBehaviour
             _boxCollider.center = _boxColliderCenter / 2;
             _boxCollider.size = slideBoxColliderSize;
             isSliding = true;
+
+            MakeSound(slideClip);
         }
     }
 
@@ -283,12 +298,21 @@ public class PlayerController : MonoBehaviour
             isDead = true;
             _animator.SetTrigger("Hit");
             _animator.SetBool("Dead", true);
+
+            MakeSound(deathClip);
         }
         else if (other.CompareTag("Coin"))
         {
             other.GetComponent<Collectable>().Collected();
             LevelManager.GetInstance().AddCoin();
         }
+    }
+
+    private void MakeSound(AudioClip audioClip)
+    {
+        _audioSource.Stop();
+        _audioSource.clip = audioClip;
+        _audioSource.Play();
     }
 
     public void IncreaseSpeed()
