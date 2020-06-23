@@ -8,6 +8,9 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     private Image panelGameOver;
 
+    [SerializeField]
+    private Text textCoins;
+
     private bool isPause = false;
 
     void Start() {
@@ -22,6 +25,11 @@ public class GameController : MonoBehaviour {
     public void Pause() {
         isPause = true;
         panelGameOver.gameObject.SetActive(true);
+    }
+
+    public void UpdateCoins(string score)
+    {
+        textCoins.text = score;
     }
 
 }

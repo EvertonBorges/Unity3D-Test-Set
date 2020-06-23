@@ -240,6 +240,11 @@ public class PlayerController : MonoBehaviour
             _animator.SetTrigger("Hit");
             _animator.SetBool("Dead", true);
         }
+        else if (other.CompareTag("Coin"))
+        {
+            other.GetComponent<Collectable>().Collected();
+            LevelManager.GetInstance().AddCoin();
+        }
     }
 
 }
