@@ -19,6 +19,9 @@ public class PlayerDatas
 public class GameController : MonoBehaviour {
 
     [SerializeField]
+    private SceneController sceneController;
+
+    [SerializeField]
     private Button buttonPause;
 
     [SerializeField]
@@ -55,7 +58,6 @@ public class GameController : MonoBehaviour {
     private Text textBestScoreNew;
 
     private PlayerController _playerController;
-    private SceneController _sceneController;
     private LevelManager _levelManager;
 
     private string _filePath;
@@ -63,7 +65,6 @@ public class GameController : MonoBehaviour {
     void Awake()
     {
         _playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        _sceneController = GetComponent<SceneController>();
         _levelManager = GetComponent<LevelManager>();
 
         _filePath = Application.persistentDataPath + "/playerInfo.dat";
@@ -86,7 +87,7 @@ public class GameController : MonoBehaviour {
         if (!panelPause.gameObject.activeSelf)
         {
             _playerController.Pause();
-            _sceneController.PressButton();
+            sceneController.PressButton();
             panelPause.gameObject.SetActive(true);
         }
     }
@@ -143,7 +144,7 @@ public class GameController : MonoBehaviour {
     public void UnPause()
     {
         _playerController.UnPause();
-        _sceneController.PressButton();
+        sceneController.PressButton();
         panelPause.gameObject.SetActive(false);
     }
 

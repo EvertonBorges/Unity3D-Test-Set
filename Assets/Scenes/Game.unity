@@ -3862,6 +3862,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73c878a1f997e654fb0e5faff4c8265e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sceneController: {fileID: 1707244598}
   buttonPause: {fileID: 1303251689}
   panelPause: {fileID: 519287076}
   panelGameOver: {fileID: 793258796}
@@ -5627,7 +5628,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &1976047983
 RectTransform:
