@@ -17,6 +17,8 @@ public class LevelManager : MonoBehaviour
     private int[] _distanceTravels = { 0, 0, 0, 0, 0 };
     private int score = 0;
 
+    private PlayerDatas datas = null;
+
     void Awake()
     {
         _gameController = GetComponent<GameController>();
@@ -66,6 +68,77 @@ public class LevelManager : MonoBehaviour
     public int GetCoins()
     {
         return coins;
+    }
+
+    private void SaveDatas()
+    {
+        if (datas != null) UpdateDatas(); else CreateDatas();
+
+        _gameController.Save(datas);
+    }
+
+    private void UpdateDatas()
+    {
+        if (datas.distance < distance)
+        {
+            datas.distance = distance;
+        }
+        datas.coins += coins;
+
+        int position = -1;
+        int[] scores = new int[10];
+        for (int i = 0; i < datas.scores.Length; i++)
+        {
+            int score = datas.scores[i];
+            scores[i] = score;
+            if (this.score > score)
+            {
+                position = i;
+                scores[i] = this.score;
+                break;
+            }
+        }
+        if (position != -1)
+        {
+            for (int i = position + 1; i < datas.scores.Length - 1; i++)
+            {
+                scores[i] = datas.scores[i - 1];
+            }
+        }
+
+        datas.scores = scores;
+    }
+
+    private void CreateDatas()
+    {
+        int[] scores = new int[10];
+        scores[0] = this.score;
+
+        datas = new PlayerDatas();
+        datas.distance = distance;
+        datas.coins = coins;
+        datas.scores = scores;
+    }
+
+    public void LoadDatas(PlayerDatas datas)
+    {
+        int bestScore;
+        bool isNewRecord;
+
+        if (datas != null)
+        {
+            this.datas = datas;
+            bestScore = this.score > datas.scores[0] ? this.score : datas.scores[0];
+            isNewRecord = this.score > datas.scores[0];
+        } else
+        {
+            bestScore = score;
+            isNewRecord = true;
+        }
+
+        _gameController.UpdateBestScore(bestScore.ToString(), isNewRecord);
+
+        SaveDatas();
     }
 
 }

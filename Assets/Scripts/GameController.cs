@@ -2,6 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+using Random = UnityEngine.Random;
+
+[Serializable]
+public class PlayerDatas
+{
+    public int coins { set; get; }
+    public int distance { set; get; }
+    public int[] scores { set; get; }
+}
 
 [RequireComponent(typeof(SceneController))]
 public class GameController : MonoBehaviour {
@@ -36,13 +48,25 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     private Text textDistance;
 
+    [SerializeField]
+    private Text textBestScore;
+
+    [SerializeField]
+    private Text textBestScoreNew;
+
     private PlayerController _playerController;
     private SceneController _sceneController;
+    private LevelManager _levelManager;
+
+    private string _filePath;
 
     void Awake()
     {
         _playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         _sceneController = GetComponent<SceneController>();
+        _levelManager = GetComponent<LevelManager>();
+
+        _filePath = Application.persistentDataPath + "/playerInfo.dat";
     }
 
     void Start() 
@@ -71,6 +95,13 @@ public class GameController : MonoBehaviour {
     {
         if (!panelGameOver.gameObject.activeSelf)
         {
+            PlayerDatas datas = null;
+            if (File.Exists(_filePath))
+            {
+                datas = Load();
+            }
+            _levelManager.LoadDatas(datas);
+
             panelGameOver.gameObject.SetActive(true);
         }
     }
@@ -91,6 +122,12 @@ public class GameController : MonoBehaviour {
         textDistance.text = distance;
     }
 
+    public void UpdateBestScore(string bestScore, bool isNewRecord)
+    {
+        textBestScore.text = bestScore;
+        textBestScoreNew.gameObject.SetActive(isNewRecord);
+    }
+
     public void ShowUiGame()
     {
         panelCoins.gameObject.SetActive(true);
@@ -108,6 +145,29 @@ public class GameController : MonoBehaviour {
         _playerController.UnPause();
         _sceneController.PressButton();
         panelPause.gameObject.SetActive(false);
+    }
+
+    public void Save(PlayerDatas datas)
+    {
+        BinaryFormatter binaryFormatter = new BinaryFormatter();
+        FileStream file = File.Create(_filePath);
+
+        binaryFormatter.Serialize(file, datas);
+        file.Close();
+    }
+
+    private PlayerDatas Load()
+    {
+        BinaryFormatter binaryFormatter = new BinaryFormatter();
+        FileStream file = File.Open(_filePath, FileMode.Open);
+
+        PlayerDatas datas = (PlayerDatas) binaryFormatter.Deserialize(file);
+        file.Close();
+
+        int bestScore = datas.scores[datas.scores.Length - 1];
+        textBestScore.text = bestScore.ToString();
+
+        return datas;
     }
 
 }
