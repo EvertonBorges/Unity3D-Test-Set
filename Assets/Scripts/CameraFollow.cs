@@ -49,4 +49,5 @@ public class CameraFollow : MonoBehaviour
     {
         return animationDuration;
     }
+
 }

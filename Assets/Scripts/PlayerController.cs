@@ -257,7 +257,7 @@ public class PlayerController : MonoBehaviour
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, laneSpeed * Time.deltaTime);
     }
 
-    private void Jump()
+    public bool Jump()
     {
         if (!isJumping)
         {
@@ -269,10 +269,14 @@ public class PlayerController : MonoBehaviour
             isSliding = false;
 
             MakeSound(jumpClip);
+
+            return true;
         }
+
+        return false;
     }
 
-    private void Slide()
+    public bool Slide()
     {
         if (!isSliding)
         {
@@ -286,10 +290,14 @@ public class PlayerController : MonoBehaviour
             isSliding = true;
 
             MakeSound(slideClip);
+
+            return true;
         }
+
+        return false;
     }
 
-    void MovePlayerHorizontal(bool isToRight = true)
+    public void MovePlayerHorizontal(bool isToRight = true)
     {
         int newLane = currentLane + (isToRight ? 1 : -1);
         if (newLane < 0 || newLane > 2) return;
