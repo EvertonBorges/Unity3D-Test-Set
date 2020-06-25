@@ -70,8 +70,6 @@ public class PlayerController : MonoBehaviour
     // Horizontal Lane variables
     private int currentLane = 1;
     private Vector3 targetPosition;
-    private bool isMovingRigth = false;
-    private bool isMovingLeft = false;
 
     // Swipe variables
     private bool isSwiping = false;
@@ -178,12 +176,6 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 targetPosition = new Vector3(this.targetPosition.x, this.targetPosition.y, transform.position.z);
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, laneSpeed * Time.deltaTime);
-
-        if (transform.position == targetPosition)
-        {
-            isMovingLeft = false;
-            isMovingRigth = false;
-        }
     }
 
     private void DesktopInputs()
@@ -336,8 +328,6 @@ public class PlayerController : MonoBehaviour
 
         currentLane = newLane;
         targetPosition = new Vector3(currentLane - 1, 0f, 0f);
-        if (isToRight) isMovingRigth = true;
-        if (!isToRight) isMovingLeft = true;
     }
 
     void FixedUpdate()
