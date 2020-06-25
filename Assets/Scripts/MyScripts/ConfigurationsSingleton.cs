@@ -8,7 +8,9 @@ using System.IO;
 [Serializable]
 public class Settings
 {
+    // Enable/Disable AI controller
     public bool aiEnable;
+    // Enable/Disable AI focus in get coins (fishes)
     public bool aiCoinsEnable;
 
     public Settings()
@@ -73,6 +75,7 @@ public class ConfigurationsSingleton : MonoBehaviour
         }
     }
 
+    // Save settings in internal file
     public void Save(Settings datas)
     {
         BinaryFormatter binaryFormatter = new BinaryFormatter();
@@ -84,6 +87,7 @@ public class ConfigurationsSingleton : MonoBehaviour
         _settings = datas;
     }
 
+    // Load the settings in internal file
     private void Load()
     {
         BinaryFormatter binaryFormatter = new BinaryFormatter();
