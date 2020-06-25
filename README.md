@@ -2,6 +2,8 @@
 
 Game developed to SIDIA unity test
 
+Download Link [apk](https://evertonborges.itch.io/trash-dash)
+
 ## Tutorial
 ### Start Screen
 ![Start Screen](/Screenshots/Tutorial/Tutorial%20-%20Start%20Screen.png?raw=true "Start Screen")
