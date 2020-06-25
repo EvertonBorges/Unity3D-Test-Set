@@ -18,7 +18,7 @@ public class CameraFollow : MonoBehaviour
     private float transition = 0f;
 
     private Vector3 startOffset;
-    private Vector3 animationOffset = new Vector3(0f, 5f, 5f);
+    private Vector3 animationOffset = new Vector3(0f, 4f, 5f);
 
     // Start is called before the first frame update
     void Start()
@@ -41,7 +41,7 @@ public class CameraFollow : MonoBehaviour
         {
             transform.position = Vector3.Lerp(finishPosition + animationOffset, finishPosition, transition);
             transition += Time.deltaTime * 1f / animationDuration;
-            transform.LookAt(target.position + Vector3.up);
+            transform.LookAt(target.position + Vector3.up * 2.8f);
         }
     }
 

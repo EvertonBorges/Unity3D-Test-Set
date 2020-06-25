@@ -60,6 +60,9 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     private AiController aiController;
 
+    [SerializeField]
+    private Text labelAiIsPlaying;
+
     private PlayerController _playerController;
     private LevelManager _levelManager;
     private Settings _settings;
@@ -75,6 +78,7 @@ public class GameController : MonoBehaviour {
         PlayerController.UpdatePlayerController(!_settings.aiEnable);
         aiController.gameObject.SetActive(_settings.aiEnable);
         AiController.SetFocusCoin(_settings.aiCoinsEnable);
+        labelAiIsPlaying.gameObject.SetActive(_settings.aiEnable);
 
         _filePath = Application.persistentDataPath + "/playerInfo.dat";
     }
@@ -98,6 +102,7 @@ public class GameController : MonoBehaviour {
             _playerController.Pause();
             sceneController.PressButton();
             panelPause.gameObject.SetActive(true);
+            labelAiIsPlaying.gameObject.SetActive(false);
         }
     }
 
@@ -155,6 +160,7 @@ public class GameController : MonoBehaviour {
         _playerController.UnPause();
         sceneController.PressButton();
         panelPause.gameObject.SetActive(false);
+        labelAiIsPlaying.gameObject.SetActive(_settings.aiEnable);
     }
 
     public void Save(PlayerDatas datas)
