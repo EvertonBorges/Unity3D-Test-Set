@@ -14,7 +14,9 @@ public enum ObjectType
 
 public class Move
 {
+    // When the player reaches this positions he needs to make the move in moveType.
     public float position;
+    // Storage the moviment the player needs to do.
     public MoveType moveType;
 
     public Move() {}
@@ -36,10 +38,11 @@ public class AiController : MonoBehaviour
 
     private PlayerController _playerController;
 
-    private float lastPosition = 0f;
+    private float lastPlayerPositionZ = 0f;
 
     private ObjectType[,] collisions = { { ObjectType.NONE, ObjectType.NONE, ObjectType.NONE }, { ObjectType.NONE, ObjectType.NONE, ObjectType.NONE } };
 
+    // This list storage every player moviment when AI make a decision.
     private List<Move> moves = new List<Move>();
 
     private static bool focusToPickCoins = false;
@@ -52,6 +55,7 @@ public class AiController : MonoBehaviour
 
     void Update()
     {
+        // AI need to be detecting collisions in front of the player.
         Vector3 finishPosition = _playerController.transform.position;
         finishPosition.x = 0f;
         finishPosition.y = 0f;
@@ -59,24 +63,27 @@ public class AiController : MonoBehaviour
 
         transform.position = finishPosition;
 
-        float actualPosition = _playerController.transform.position.z;
+        float playerPositionZ = _playerController.transform.position.z;
 
-        if (actualPosition - lastPosition >= 1f)
+        if (playerPositionZ - lastPlayerPositionZ >= 1f) // 1f is to AI make any decision every timme when player run 1f in z axys
         {
             MakeDecision();
-
-            for (int i = 0; i < collisions.GetLength(0); i++)
-            {
-                for (int j = 0; j < collisions.GetLength(1); j++)
-                {
-                    collisions[i, j] = ObjectType.NONE;
-                }
-            }
-
-            lastPosition = Mathf.Floor(actualPosition);
+            ClearCollisions();
+            lastPlayerPositionZ = Mathf.Floor(playerPositionZ);
         }
 
         MakeMove();
+    }
+
+    private void ClearCollisions()
+    {
+        for (int i = 0; i < collisions.GetLength(0); i++)
+        {
+            for (int j = 0; j < collisions.GetLength(1); j++)
+            {
+                collisions[i, j] = ObjectType.NONE;
+            }
+        }
     }
 
     /*
@@ -178,6 +185,7 @@ public class AiController : MonoBehaviour
         }
     }
 
+    // Ai collisions call this function to update vector collisions in every collision and informs the ObjectType collision.
     public void UpdateCollisions(int row, int column, ObjectType value)
     {
         collisions[row, column] = value;
@@ -186,10 +194,11 @@ public class AiController : MonoBehaviour
     private void MakeDecision()
     {
         float x = Mathf.Round(_playerController.transform.position.x);
-        bool isInLeftLine = x < -0.95f;
-        bool isInMidLine = x >= -0.05f && x <= 0.05f;
-        bool isInRightLine = x > 0.95f;
+        bool playerInLeftLine = x < -0.95f;
+        bool playerInMidLine = x >= -0.05f && x <= 0.05f;
+        bool playerInRightLine = x > 0.95f;
 
+        // When has a high obstacle, player needs to slide
         if (collisions[0, 0] == ObjectType.OBSTACLE && collisions[0, 1] == ObjectType.OBSTACLE && collisions[0, 2] == ObjectType.OBSTACLE)
         {
             if (moves.Count > 0 && moves[0].moveType == MoveType.SLIDE) return;
@@ -197,6 +206,7 @@ public class AiController : MonoBehaviour
             Move move = new Move(transform.position.z - 3f, MoveType.SLIDE);
             moves.Add(move);
         }
+        // When has a low obstacle, player needs to jump
         else if (collisions[1, 0] == ObjectType.OBSTACLE && collisions[1, 1] == ObjectType.OBSTACLE && collisions[1, 2] == ObjectType.OBSTACLE)
         {
             if (moves.Count > 0 && moves[0].moveType == MoveType.JUMP) return;
@@ -204,21 +214,24 @@ public class AiController : MonoBehaviour
             Move move = new Move(transform.position.z - 3f, MoveType.JUMP);
             moves.Add(move);
         }
-        else if ((collisions[0, 0] == ObjectType.OBSTACLE || collisions[1, 0] == ObjectType.OBSTACLE) && isInLeftLine)
+        // When a obstacle in left lane and player is in left line, player needs move to right
+        else if ((collisions[0, 0] == ObjectType.OBSTACLE || collisions[1, 0] == ObjectType.OBSTACLE) && playerInLeftLine)
         {
             if (moves.Count > 0 && moves[0].moveType == MoveType.RIGHT) return;
 
             Move move = new Move(transform.position.z - 4f, MoveType.RIGHT);
             moves.Add(move);
         }
-        else if ((collisions[0, 2] == ObjectType.OBSTACLE || collisions[1, 2] == ObjectType.OBSTACLE) && isInRightLine)
+        // When a obstacle in right lane and player is in right line, player needs move to left
+        else if ((collisions[0, 2] == ObjectType.OBSTACLE || collisions[1, 2] == ObjectType.OBSTACLE) && playerInRightLine)
         {
             if (moves.Count > 0 && moves[0].moveType == MoveType.LEFT) return;
 
             Move move = new Move(transform.position.z - 4f, MoveType.LEFT);
             moves.Add(move);
         }
-        else if ((collisions[0, 1] == ObjectType.OBSTACLE || collisions[1, 1] == ObjectType.OBSTACLE) && isInMidLine)
+        // When a obstacle in mid lane and player is in mid line, player needs move to left or right
+        else if ((collisions[0, 1] == ObjectType.OBSTACLE || collisions[1, 1] == ObjectType.OBSTACLE) && playerInMidLine)
         {
             if (moves.Count > 0 && (moves[0].moveType == MoveType.RIGHT || moves[0].moveType == MoveType.RIGHT)) return;
 
@@ -227,9 +240,11 @@ public class AiController : MonoBehaviour
             Move move = new Move(transform.position.z - 4f, moveType);
             moves.Add(move);
         }
+        // When AI is focused to get coins (fishes)
         else if (focusToPickCoins)
         {
-            if (collisions[1, 0] == ObjectType.COIN && isInRightLine)
+            // When a coin is in left lane and player is in right line, player needs move to left 2 times
+            if (collisions[1, 0] == ObjectType.COIN && playerInRightLine)
             {
                 if (moves.Count > 0 && moves[0].moveType == MoveType.LEFT) return;
 
@@ -238,7 +253,8 @@ public class AiController : MonoBehaviour
                 moves.Add(move1);
                 moves.Add(move2);
             }
-            else if (collisions[1, 2] == ObjectType.COIN && isInLeftLine)
+            // When a coin is in right lane and player is in left line, player needs move to right 2 times
+            else if (collisions[1, 2] == ObjectType.COIN && playerInLeftLine)
             {
                 if (moves.Count > 0 && moves[0].moveType == MoveType.RIGHT) return;
 
@@ -247,28 +263,32 @@ public class AiController : MonoBehaviour
                 moves.Add(move1);
                 moves.Add(move2);
             }
-            else if (collisions[1, 0] == ObjectType.COIN && isInMidLine)
+            // When a coin is in left lane and player is in mid line, player needs move to left
+            else if (collisions[1, 0] == ObjectType.COIN && playerInMidLine)
             {
                 if (moves.Count > 0 && moves[0].moveType == MoveType.LEFT) return;
 
                 Move move = new Move(transform.position.z, MoveType.LEFT);
                 moves.Add(move);
             }
-            else if (collisions[1, 2] == ObjectType.COIN && isInMidLine)
+            // When a coin is in right lane and player is in mid line, player needs move to right
+            else if (collisions[1, 2] == ObjectType.COIN && playerInMidLine)
             {
                 if (moves.Count > 0 && moves[0].moveType == MoveType.RIGHT) return;
 
                 Move move = new Move(transform.position.z, MoveType.RIGHT);
                 moves.Add(move);
             }
-            else if (collisions[1, 1] == ObjectType.COIN && isInRightLine)
+            // When a coin is in mid lane and player is in right line, player needs move to left
+            else if (collisions[1, 1] == ObjectType.COIN && playerInRightLine)
             {
                 if (moves.Count > 0 && moves[0].moveType == MoveType.LEFT) return;
 
                 Move move = new Move(transform.position.z, MoveType.LEFT);
                 moves.Add(move);
             }
-            else if (collisions[1, 1] == ObjectType.COIN && isInLeftLine)
+            // When a coin is in mid lane and player is in left line, player needs move to right
+            else if (collisions[1, 1] == ObjectType.COIN && playerInLeftLine)
             {
                 if (moves.Count > 0 && moves[0].moveType == MoveType.RIGHT) return;
 
