@@ -57,8 +57,12 @@ public class GameController : MonoBehaviour {
     [SerializeField]
     private Text textBestScoreNew;
 
+    [SerializeField]
+    private AiController aiController;
+
     private PlayerController _playerController;
     private LevelManager _levelManager;
+    private Settings _settings;
 
     private string _filePath;
 
@@ -66,6 +70,11 @@ public class GameController : MonoBehaviour {
     {
         _playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         _levelManager = GetComponent<LevelManager>();
+        _settings = ConfigurationsSingleton.Instance.settings;
+
+        PlayerController.UpdatePlayerController(!_settings.aiEnable);
+        aiController.gameObject.SetActive(_settings.aiEnable);
+        AiController.SetFocusCoin(_settings.aiCoinsEnable);
 
         _filePath = Application.persistentDataPath + "/playerInfo.dat";
     }

@@ -64,6 +64,8 @@ public class PlayerController : MonoBehaviour
     // Horizontal Lane variables
     private int currentLane = 1;
     private Vector3 targetPosition;
+    private bool isMovingRigth = false;
+    private bool isMovingLeft = false;
 
     // Swipe variables
     private bool isSwiping = false;
@@ -89,6 +91,9 @@ public class PlayerController : MonoBehaviour
     // Game State variables
     private bool _isDead = false;
     private bool _isPause = false;
+
+    // Controller variable
+    private static bool _playerHasController = true;
 
     void Awake()
     {
@@ -154,67 +159,73 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        if (_playerHasController)
         {
-            MovePlayerHorizontal();
-        }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            MovePlayerHorizontal(false);
-        }
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            Jump();
-        }
-        else if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            Slide();
-        }
-
-        if (Input.touchCount == 1)
-        {
-            if (isSwiping)
+            if (Input.GetKeyDown(KeyCode.RightArrow))
             {
-                Vector2 diff = Input.GetTouch(0).position - startSwipePosition;
-                Vector2 magnitude = new Vector2(diff.x / Screen.width, diff.y / Screen.height);
-                if (magnitude.magnitude > 0.01f)
-                {
-                    if (Mathf.Abs(magnitude.x) > Mathf.Abs(magnitude.y))
-                    {
-                        if (magnitude.x > 0f)
-                        {
-                            MovePlayerHorizontal();
-                        }
-                        else
-                        {
-                            MovePlayerHorizontal(false);
-                        }
-                    }
-                    else
-                    {
-                        if (magnitude.y > 0f)
-                        {
-                            Jump();
-                        }
-                        else
-                        {
-                            Slide();
-                        }
-                    }
+                MovePlayerHorizontal();
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                MovePlayerHorizontal(false);
+            }
+            else if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                Jump();
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                Slide();
+            }
+        }
 
+        if (_playerHasController)
+        {
+            if (Input.touchCount == 1)
+            {
+                if (isSwiping)
+                {
+                    Vector2 diff = Input.GetTouch(0).position - startSwipePosition;
+                    Vector2 magnitude = new Vector2(diff.x / Screen.width, diff.y / Screen.height);
+                    if (magnitude.magnitude > 0.01f)
+                    {
+                        if (Mathf.Abs(magnitude.x) > Mathf.Abs(magnitude.y))
+                        {
+                            if (magnitude.x > 0f)
+                            {
+                                MovePlayerHorizontal();
+                            }
+                            else
+                            {
+                                MovePlayerHorizontal(false);
+                            }
+                        }
+                        else
+                        {
+                            if (magnitude.y > 0f)
+                            {
+                                Jump();
+                            }
+                            else
+                            {
+                                Slide();
+                            }
+                        }
+
+                        isSwiping = false;
+                    }
+                }
+
+                if(Input.GetTouch(0).phase == TouchPhase.Began)
+                {
+                    isSwiping = true;
+                    startSwipePosition = Input.GetTouch(0).position;
+                }
+
+                if(Input.GetTouch(0).phase == TouchPhase.Ended)
+                {
                     isSwiping = false;
                 }
-            }
-
-            if(Input.GetTouch(0).phase == TouchPhase.Began)
-            {
-                isSwiping = true;
-                startSwipePosition = Input.GetTouch(0).position;
-            }
-
-            if(Input.GetTouch(0).phase == TouchPhase.Ended)
-            {
-                isSwiping = false;
             }
         }
 
@@ -255,6 +266,12 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 targetPosition = new Vector3(this.targetPosition.x, this.targetPosition.y, transform.position.z);
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, laneSpeed * Time.deltaTime);
+
+        if (transform.position == targetPosition)
+        {
+            isMovingLeft = false;
+            isMovingRigth = false;
+        }
     }
 
     public bool Jump()
@@ -304,6 +321,8 @@ public class PlayerController : MonoBehaviour
 
         currentLane = newLane;
         targetPosition = new Vector3(currentLane - 1, 0f, 0f);
+        if (isToRight) isMovingRigth = true;
+        if (!isToRight) isMovingLeft = true;
     }
 
     void FixedUpdate()
@@ -364,6 +383,31 @@ public class PlayerController : MonoBehaviour
     public void UnPause()
     {
         _isPause = false;
+    }
+
+    public bool IsMovingRigth()
+    {
+        return isMovingRigth;
+    }
+    
+    public bool IsMovingLeft()
+    {
+        return isMovingLeft;
+    }
+
+    public bool IsJumping()
+    {
+        return isJumping;
+    }
+
+    public bool IsSliding()
+    {
+        return isSliding;
+    }
+
+    public static void UpdatePlayerController(bool hasController)
+    {
+        _playerHasController = hasController;
     }
 
 }

@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -3136,7 +3136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &998340445
 Transform:
   m_ObjectHideFlags: 0
@@ -4325,6 +4325,7 @@ MonoBehaviour:
   textDistance: {fileID: 16043824}
   textBestScore: {fileID: 597132907}
   textBestScoreNew: {fileID: 1428280208}
+  aiController: {fileID: 998340446}
 --- !u!114 &1315268723
 MonoBehaviour:
   m_ObjectHideFlags: 0
