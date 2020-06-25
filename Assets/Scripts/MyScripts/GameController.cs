@@ -73,14 +73,22 @@ public class GameController : MonoBehaviour {
     {
         _playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         _levelManager = GetComponent<LevelManager>();
+        _filePath = Application.persistentDataPath + "/playerInfo.dat";
+        
         _settings = ConfigurationsSingleton.Instance.settings;
 
-        PlayerController.UpdatePlayerController(!_settings.aiEnable);
-        aiController.gameObject.SetActive(_settings.aiEnable);
-        AiController.SetFocusCoin(_settings.aiCoinsEnable);
-        labelAiIsPlaying.gameObject.SetActive(_settings.aiEnable);
-
-        _filePath = Application.persistentDataPath + "/playerInfo.dat";
+        if (_settings != null)
+        {
+            PlayerController.UpdatePlayerController(!_settings.aiEnable);
+            AiController.SetFocusCoin(_settings.aiCoinsEnable);
+            aiController.gameObject.SetActive(_settings.aiEnable);
+            labelAiIsPlaying.gameObject.SetActive(_settings.aiEnable);
+        }
+        else
+        {
+            aiController.gameObject.SetActive(false);
+            labelAiIsPlaying.gameObject.SetActive(false);
+        }
     }
 
     void Start() 
@@ -110,14 +118,15 @@ public class GameController : MonoBehaviour {
     {
         if (!panelGameOver.gameObject.activeSelf)
         {
+            panelGameOver.gameObject.SetActive(true);
+            labelAiIsPlaying.gameObject.SetActive(false);
+
             PlayerDatas datas = null;
             if (File.Exists(_filePath))
             {
                 datas = Load();
             }
             _levelManager.LoadDatas(datas);
-
-            panelGameOver.gameObject.SetActive(true);
         }
     }
 
@@ -160,7 +169,7 @@ public class GameController : MonoBehaviour {
         _playerController.UnPause();
         sceneController.PressButton();
         panelPause.gameObject.SetActive(false);
-        labelAiIsPlaying.gameObject.SetActive(_settings.aiEnable);
+        if (_settings != null) labelAiIsPlaying.gameObject.SetActive(_settings.aiEnable);
     }
 
     public void Save(PlayerDatas datas)
