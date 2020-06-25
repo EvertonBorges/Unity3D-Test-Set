@@ -32,3 +32,8 @@ Game developed to SIDIA unity test
 - See the best score;
 - You can restart the game pressing in RESTART button;
 - You can go back to Main Screen pressing in MAIN SCREEN button.
+
+## Assets
+[Icons set](https://assetstore.unity.com/packages/2d/gui/icons/icons-set-58217)
+
+[Endless Runner - Sample Game](https://assetstore.unity.com/packages/essentials/tutorial-projects/endless-runner-sample-game-87901)
