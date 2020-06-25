@@ -6,9 +6,11 @@ public class TrackController : MonoBehaviour
 {
 
     [SerializeField]
+    [Tooltip("Static obstacles in the middle of the line")]
     private List<GameObject> obstaclesPrefabInCenter;
 
     [SerializeField]
+    [Tooltip("Obstacles that alternate between lines")]
     private List<GameObject> obstaclesPrefabAnywhere;
 
     [SerializeField]
@@ -16,16 +18,22 @@ public class TrackController : MonoBehaviour
 
     [SerializeField]
     [Range(9f, 15f)]
+    [Tooltip("Minimal distance between obstacles")]
     private float minDistanceBetweenObstacles;
 
     [SerializeField]
     [Range(15f, 23f)]
+    [Tooltip("Maximum distance between obstacles")]
     private float maxDistanceBetweenObstacles;
 
+    // All prefab obstacles
     private List<GameObject> obstaclesPrefab = new List<GameObject>();
 
+    // All instantiates obstacles
     private List<GameObject> obstacles = new List<GameObject>();
+    // All instantiates coins
     private List<GameObject> coins = new List<GameObject>();
+    // All positions start/end between obstacles in track
     private List<int[]> spacesBetweenObstacles = new List<int[]>();
 
     private List<GameObject> poolCoins = new List<GameObject>();
@@ -35,6 +43,7 @@ public class TrackController : MonoBehaviour
         obstaclesPrefab.AddRange(obstaclesPrefabAnywhere);
         obstaclesPrefab.AddRange(obstaclesPrefabInCenter);
 
+        // Instantiate all coins and storage in a list.
         for (int i = 0; i < 200; i++)
         {
             GameObject coin = Instantiate(coinPrefab, transform);
@@ -117,6 +126,7 @@ public class TrackController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        // When game need to increase the player speed
         if (other.CompareTag("Player"))
         {
             other.GetComponent<PlayerController>().IncreaseSpeed();

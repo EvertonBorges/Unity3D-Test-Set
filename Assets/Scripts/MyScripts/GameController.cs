@@ -7,6 +7,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using Random = UnityEngine.Random;
 
+// Storage the main information of the player gameplays
 [Serializable]
 public class PlayerDatas
 {

@@ -10,46 +10,52 @@ public class PlayerController : MonoBehaviour
     [Header("Speed Parameters")]
     [Range(5, 20)]
     [SerializeField]
+    [Tooltip("Player start speed")]
     private int minSpeed;
 
     [Range(20, 40)]
     [SerializeField]
+    [Tooltip("Player max speed reachable")]
     private int maxSpeed;
 
     [Range(1f, 1.5f)]
     [SerializeField]
+    [Tooltip("Player speed multiplier, how speed increase in every new level")]
     private float speedMultiplier;
 
     [SerializeField]
+    [Tooltip("Lane speed to move to sides")]
     private float laneSpeed;
 
     [Header("Jump Parameters")]
     [SerializeField]
+    [Tooltip("Distance of the jump")]
     private float jumpLength;
 
     [SerializeField]
+    [Tooltip("Height of the jump")]
     private float jumpHeigth;
 
     [Header("Slide Parameters")]
     [SerializeField]
+    [Tooltip("Distance of the Slide")]
     private float slideLength;
-
-    [Header("Camera Parameters")]
-    [Range(0f, 3f)]
-    [SerializeField]
-    private float timeToStartAfterCameraLock;
 
     [Header("SFX")]
     [SerializeField]
+    [Tooltip("Jump SFX")]
     private AudioClip jumpClip;
 
     [SerializeField]
+    [Tooltip("Slide SFX")]
     private AudioClip slideClip;
 
     [SerializeField]
+    [Tooltip("Death SFX")]
     private AudioClip deathClip;
 
     [SerializeField]
+    [Tooltip("4321 SFX")]
     private AudioClip readStartClip;
 
     private Rigidbody _rigidbody;
@@ -139,7 +145,6 @@ public class PlayerController : MonoBehaviour
             _animator.Play("Start");
             _cameraLock = true;
             _gameController.ShowUiGame();
-            
         }
 
         if (_cameraLock && Time.time >= _startTimeToLockCamera + 0.25f && !_audioSource.isPlaying && !_startToRun)
@@ -161,74 +166,98 @@ public class PlayerController : MonoBehaviour
 
         if (_playerHasController)
         {
-            if (Input.GetKeyDown(KeyCode.RightArrow))
-            {
-                MovePlayerHorizontal();
-            }
-            else if (Input.GetKeyDown(KeyCode.LeftArrow))
-            {
-                MovePlayerHorizontal(false);
-            }
-            else if (Input.GetKeyDown(KeyCode.UpArrow))
-            {
-                Jump();
-            }
-            else if (Input.GetKeyDown(KeyCode.DownArrow))
-            {
-                Slide();
-            }
+            DesktopInputs();
+            MobileInputs();
         }
 
-        if (_playerHasController)
+        GravityEffects();
+        Move();
+    }
+
+    private void Move()
+    {
+        Vector3 targetPosition = new Vector3(this.targetPosition.x, this.targetPosition.y, transform.position.z);
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, laneSpeed * Time.deltaTime);
+
+        if (transform.position == targetPosition)
         {
-            if (Input.touchCount == 1)
+            isMovingLeft = false;
+            isMovingRigth = false;
+        }
+    }
+
+    private void DesktopInputs()
+    {
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            MovePlayerHorizontal();
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            MovePlayerHorizontal(false);
+        }
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            Jump();
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            Slide();
+        }
+    }
+
+    private void MobileInputs()
+    {
+        if (Input.touchCount == 1)
+        {
+            if (isSwiping)
             {
-                if (isSwiping)
+                Vector2 diff = Input.GetTouch(0).position - startSwipePosition;
+                Vector2 magnitude = new Vector2(diff.x / Screen.width, diff.y / Screen.height);
+                if (magnitude.magnitude > 0.01f)
                 {
-                    Vector2 diff = Input.GetTouch(0).position - startSwipePosition;
-                    Vector2 magnitude = new Vector2(diff.x / Screen.width, diff.y / Screen.height);
-                    if (magnitude.magnitude > 0.01f)
+                    if (Mathf.Abs(magnitude.x) > Mathf.Abs(magnitude.y))
                     {
-                        if (Mathf.Abs(magnitude.x) > Mathf.Abs(magnitude.y))
+                        if (magnitude.x > 0f)
                         {
-                            if (magnitude.x > 0f)
-                            {
-                                MovePlayerHorizontal();
-                            }
-                            else
-                            {
-                                MovePlayerHorizontal(false);
-                            }
+                            MovePlayerHorizontal();
                         }
                         else
                         {
-                            if (magnitude.y > 0f)
-                            {
-                                Jump();
-                            }
-                            else
-                            {
-                                Slide();
-                            }
+                            MovePlayerHorizontal(false);
                         }
-
-                        isSwiping = false;
                     }
-                }
+                    else
+                    {
+                        if (magnitude.y > 0f)
+                        {
+                            Jump();
+                        }
+                        else
+                        {
+                            Slide();
+                        }
+                    }
 
-                if(Input.GetTouch(0).phase == TouchPhase.Began)
-                {
-                    isSwiping = true;
-                    startSwipePosition = Input.GetTouch(0).position;
-                }
-
-                if(Input.GetTouch(0).phase == TouchPhase.Ended)
-                {
                     isSwiping = false;
                 }
             }
-        }
 
+            if (Input.GetTouch(0).phase == TouchPhase.Began)
+            {
+                isSwiping = true;
+                startSwipePosition = Input.GetTouch(0).position;
+            }
+
+            if (Input.GetTouch(0).phase == TouchPhase.Ended)
+            {
+                isSwiping = false;
+            }
+        }
+    }
+
+    private void GravityEffects()
+    {
         if (isJumping)
         {
             float ratio = (transform.position.z - jumpStart) / (!isSliding ? jumpLength : jumpLength / 3);
@@ -238,7 +267,7 @@ public class PlayerController : MonoBehaviour
                 _animator.SetBool("Jumping", false);
             }
             else
-            {   
+            {
                 this.targetPosition.y = Mathf.Sin(ratio * Mathf.PI) * jumpHeigth;
             }
         }
@@ -257,20 +286,6 @@ public class PlayerController : MonoBehaviour
                     _boxCollider.center = _boxColliderCenter;
                 }
             }
-        }
-
-        Move();
-    }
-
-    private void Move()
-    {
-        Vector3 targetPosition = new Vector3(this.targetPosition.x, this.targetPosition.y, transform.position.z);
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, laneSpeed * Time.deltaTime);
-
-        if (transform.position == targetPosition)
-        {
-            isMovingLeft = false;
-            isMovingRigth = false;
         }
     }
 
@@ -383,26 +398,6 @@ public class PlayerController : MonoBehaviour
     public void UnPause()
     {
         _isPause = false;
-    }
-
-    public bool IsMovingRigth()
-    {
-        return isMovingRigth;
-    }
-    
-    public bool IsMovingLeft()
-    {
-        return isMovingLeft;
-    }
-
-    public bool IsJumping()
-    {
-        return isJumping;
-    }
-
-    public bool IsSliding()
-    {
-        return isSliding;
     }
 
     public static void UpdatePlayerController(bool hasController)

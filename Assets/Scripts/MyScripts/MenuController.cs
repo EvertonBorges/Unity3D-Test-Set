@@ -18,9 +18,12 @@ public class MenuController : MonoBehaviour
     [SerializeField]
     private Text labelCoins;
 
+    [SerializeField]
+    private SceneController sceneController;
+
     void Awake()
     {
-        HideSettings();
+        panelSettings.gameObject.SetActive(false);
     }
 
     public void ShowSettings()
@@ -30,11 +33,13 @@ public class MenuController : MonoBehaviour
         toggleCoins.isOn = settings.aiCoinsEnable;
 
         panelSettings.gameObject.SetActive(true);
+        sceneController.PressButton();
     }
 
     public void HideSettings()
     {
         panelSettings.gameObject.SetActive(false);
+        sceneController.PressButton();
     }
 
     public void Save()
@@ -45,6 +50,8 @@ public class MenuController : MonoBehaviour
 
         ConfigurationsSingleton.Instance.Save(settings);
         panelSettings.gameObject.SetActive(false);
+
+        sceneController.PressButton();
     }
 
     public void SetAI()
