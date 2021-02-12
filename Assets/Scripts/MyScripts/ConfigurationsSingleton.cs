@@ -43,14 +43,12 @@ public class ConfigurationsSingleton : MonoBehaviour
     {
         get
         {
-            /*
             if (_instance == null)
             {
                 GameObject gameObject = new GameObject("Configurations");
                 ConfigurationsSingleton component = gameObject.AddComponent<ConfigurationsSingleton>();
                 _instance = component;
             }
-            */
             return _instance;
         }
     }
